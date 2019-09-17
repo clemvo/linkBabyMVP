@@ -6,7 +6,7 @@ const uniqid = require('uniqid'); //for generate unique ids TODO: replace this w
 require('dotenv').config();
 
 let app = express();
-
+app.use(express.urlencoded());
 //set view engine to handlebars
 const exphbs  = require('express-handlebars');
 app.engine('handlebars', exphbs());
@@ -17,35 +17,34 @@ app.get('/', function(req, res) {
 });
 
 //Write form info into eventdata.json
-app.get('/addevent', function (req, res) { //TODO: replace with POST request 
+app.post('/addevent', function (req, res) { //TODO: replace with POST request 
     let event = {}; //all data about given event
-
-    if (req.query.event_name) {
-        event.event_name = req.query.event_name;
+    if (req.body.event_name) {
+        event.event_name = req.body.event_name;
     } else {
         event.event_name = ""; //TODO: replace with some error/default event name
     }
 
-    if (req.query.host_name) {
-        event.host_name = req.query.host_name;
+    if (req.body.host_name) {
+        event.host_name = req.body.host_name;
     } else {
         event.host_name = ""; //TODO: replace with some error/default host name
     }
 
-    if (req.query.intro_email_subject) {
-        event.intro_email_subject = req.query.intro_email_subject;
+    if (req.body.intro_email_subject) {
+        event.intro_email_subject = req.body.intro_email_subject;
     } else {
         event.intro_email_subject = ""; //TODO: replace with some error/default email subject
     }
 
-    if (req.query.intro_email_body) {
-        event.intro_email_body = req.query.intro_email_body;
+    if (req.body.intro_email_body) {
+        event.intro_email_body = req.body.intro_email_body;
     } else {
         event.intro_email_body = ""; //TODO: replace with some error/default email body
     }
 
 
-    let emails = req.query.email_list.split("\r\n").filter((e) => is_email_format(e)); //TODO: convert to unique email format
+    let emails = req.body.email_list.split("\r\n").filter((e) => is_email_format(e)); //TODO: convert to unique email format
     event.attendees = [];
 
     for (let e of emails) {
@@ -207,26 +206,26 @@ app.get('/linkme/:event_id/:id', function (req, res) {
     })
 })
 
-app.get('/submit', function (req, res) {
+app.post('/submit', function (req, res) {
     let raw = fs.readFileSync('eventdata.json');
     let data = JSON.parse(raw);
-    let event = data.events.find((e) => (e.event_id == req.query.event_id));
+    let event = data.events.find((e) => (e.event_id == req.body.event_id));
     if (!event) {
         res.send("Error: Could not find event");
     } else {
-        let attendee = event.attendees.find((a) => (a.id == req.query.id));
+        let attendee = event.attendees.find((a) => (a.id == req.body.id));
         if (!attendee){
             res.send("Error: Could not find user");
         } else {
-            attendee.name = req.query.name;
-            attendee.description = req.query.description;
-            if(req.query.connected) {
+            attendee.name = req.body.name;
+            attendee.description = req.body.description;
+            if(req.body.connected) {
                 attendee.connected = true;
             } else {
                 attendee.connected = false;
                 console.log("unconnected!");
             }
-            if(req.query.findable) {
+            if(req.body.findable) {
                 attendee.findable = true;
             } else {
                 attendee.findable = false;
@@ -260,22 +259,22 @@ app.get('/unsubscribe/:event_id/:id', function (req, res) {
     })
 })
 
-app.get('/unsubscribe_confirm', function (req, res) {
+app.post('/unsubscribe_confirm', function (req, res) {
     let raw = fs.readFileSync('eventdata.json');
     let data = JSON.parse(raw);
-    let event = data.events.find((e) => (e.event_id == req.query.event_id));
+    let event = data.events.find((e) => (e.event_id == req.body.event_id));
     if (!event) {
         res.send("Error: Could not find event");
     } else {
-        let attendee = event.attendees.find((a) => (a.id == req.query.id));
+        let attendee = event.attendees.find((a) => (a.id == req.body.id));
         if (!attendee){
             res.send("Error: Could not find user");
         } else {
             let email = attendee.email;
-            if (req.query.disconnect) {
+            if (req.body.disconnect) {
                 attendee.connected = false;
             }
-            if (req.query.make_unfindable) {
+            if (req.body.make_unfindable) {
                 attendee.findable = false;
             }
             fs.writeFileSync('eventdata.json', JSON.stringify(data, null, 2));
@@ -438,7 +437,7 @@ async function sendmail_test(message, callback){
 //HOSTING
 
 //use public/index.html as basic frontend, and host on localhost:3030 ~ TODO: host website properly
-app.use(express.static("public"));
+app.use(express.static("public")); //TODO: change this
 server = require('http').createServer(app);
 //io = io.listen(server);
 server.listen(3000, 'localhost');
