@@ -17,7 +17,7 @@ app.get('/', function(req, res) {
 });
 
 //Write form info into eventdata.json
-app.post('/addevent', function (req, res) { //TODO: replace with POST request 
+app.post('/addevent', function (req, res) {
     let event = {}; //all data about given event
     if (req.body.event_name) {
         event.event_name = req.body.event_name;
@@ -196,7 +196,7 @@ app.get('/linkme/:event_id/:id', function (req, res) {
         if (!event) {
             res.send("Error: Could not find event");
         } else {
-            let attendee = event.attendees.find((a) => (a.id == req.params.id)); //TODO: check if this finds to right user
+            let attendee = event.attendees.find((a) => (a.id == req.params.id)); //TODO: check if this finds the right user
             if (!attendee){
                 res.send("Error: Could not find user");
             } else {
@@ -283,7 +283,6 @@ app.post('/unsubscribe_confirm', function (req, res) {
 //Check data for unsent regularly
 function send_unsent_emails() { //TODO: check if async calls could fuck stuff up here
     //send intro emails which haven't been sent
-    //TODO: think about having this called on launch rather than as part of regular check
     fs.readFile('eventdata.json', (err, raw) => {
         if (err) {
             console.log(err);
@@ -349,12 +348,12 @@ function send_intro(email, event, user_id, callback){
     let link = "https://www.linkbaby.io/linkme/" + event.event_id + "/" + user_id; //TODO: change to actual link !! IMPORTANT
     sendmail({
         from: "hello@linkbaby.io",
-        //TODO: change sender to "$host via linkbaby"
+        sender: event.host_name + " via Linkbaby",
         to: email,
         subject: event.intro_email_subject,
         text: event.intro_email_body + "\n\nLink me: " + link,
         html: event.intro_email_body + "<br><br><a href=\"" + link + "\">Link me!</a>"
-    }, (err) => callback(err)); //TODO: make email more pretty
+    }, (err) => callback(err)); //TODO: make email prettier
 }
 
 function send_link(email, event, callback){ //events is in the format of userdata.json > users > links > events
@@ -389,14 +388,12 @@ function send_link(email, event, callback){ //events is in the format of userdat
 
 const nodemailer = require('nodemailer');
 const ses = require('nodemailer-ses-transport'); //for amazon simple email service
-const sparkPostTransport = require('nodemailer-sparkpost-transport'); //for sparkpost email
-//TODO: try sparkpost
 
 // async..await is not allowed in global scope, must use a wrapper
 async function sendmail(message, callback) {
     let transporter = nodemailer.createTransport(ses({
         accessKeyId: process.env.ACCESS_KEY_ID, //amazon access key ID
-        secretAccessKey: process.env.SECRET_ACCESS_KEY_ID, //amazon secret access key TODO: secure and change this
+        secretAccessKey: process.env.SECRET_ACCESS_KEY_ID, //amazon secret access key
         region : "eu-west-1"
     })); //for amazon simple email service
     // let transporter = nodemailer.createTransport(sparkPostTransport({
@@ -433,9 +430,9 @@ async function sendmail_test(message, callback){
     // Preview only available when sending through an Ethereal account
     console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
 }
+
 //HOSTING
 
-//use public/index.html as basic frontend, and host on localhost:3030 ~ TODO: host website properly
 app.use(express.static("public")); //TODO: change this
 server = require('http').createServer(app);
 //io = io.listen(server);
