@@ -39,8 +39,8 @@
           "description": "Secret stuff",
           "id": "4p6d0wk0nx6ttd",
           "intro_sent": true,
-          "connected": true,
-          "findable": true
+          "connected": false,
+          "findable": false
         }
       ],
       "event_id": "event_4p6d0wk0nx6tte"
