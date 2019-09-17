@@ -347,8 +347,7 @@ setInterval(send_unsent_emails, 3000); //TODO: call this function regularly reli
 function send_intro(email, event, user_id, callback){
     let link = "https://www.linkbaby.io/linkme/" + event.event_id + "/" + user_id; //TODO: change to actual link !! IMPORTANT
     sendmail({
-        from: "hello@linkbaby.io",
-        sender: event.host_name + " via Linkbaby",
+        from: event.host_name + " via Linkbaby <hello@linkbaby.io>",
         to: email,
         subject: event.intro_email_subject,
         text: event.intro_email_body + "\n\nLink me: " + link,
@@ -374,8 +373,8 @@ function send_link(email, event, callback){ //events is in the format of userdat
     email_body_text += "Unsubscribe: " + unsubscribe_link;
     email_body_html += "<br><a href=\"" + unsubscribe_link + "\">Unsubscribe</a>";
     let email_subject = "Link with " + event.attendee.name + " from " + event.event_name;
-    sendmail({ 
-        from: "hello@linkbaby.io",
+    sendmail({
+        from: event.attendee.name + " via Linkbaby <hello@linkbaby.io>",
         to: email, 
         subject: email_subject, 
         text: email_body_text, 
