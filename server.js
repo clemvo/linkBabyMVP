@@ -360,17 +360,20 @@ function send_intro(email, event, user_id, callback){
 function send_link(email, event, callback){ //events is in the format of userdata.json > users > links > events
     //TODO: improve this email (also options if there mulitple events)
     let email_body = "Link with " + event.attendee.name + " from " + event.event_name;
-    email_body += "\n About  " + event.attendee.name + ":";
-    email_body += "\n" + event.attendee.description;
-    email_body += "\n\n";
-    email_body += "If you want to talk to " + event.attendee.name + ", just reply to this email and it will go straight to them! If not, ignore this email - they won’t know!"
-    email_body += "\n\n";
+    let email_body_text = "\n About  " + event.attendee.name + ":";
+    let email_body_html = "<br> About  " + event.attendee.name + ":";
+    email_body_text += "\n" + event.attendee.description + "\n\n";
+    email_body_html += "<br>" + event.attendee.description + "<br><br>";
+    email_body_text += "If you want to talk to " + event.attendee.name + ", just reply to this email and it will go straight to them! If not, ignore this email - they won’t know!"
+    email_body_html += "If you want to talk to " + event.attendee.name + ", just reply to this email and it will go straight to them! If not, ignore this email - they won’t know!"
+    email_body_text += "\n\n";
+    email_body_html += "<br><br>";
 
     //TODO: Add "I’ll send you another person tomorrow. If you want to see a list of everyone from $data.groupName all at once, click here!" + functionality
 
     let unsubscribe_link = "https://www.linkbaby.io/unsubscribe/" + event.event_id + "/" + event.user_id; //TODO: change to actual link !! IMPORTANT
-    let email_body_text = email_body + "Unsubscribe: " + unsubscribe_link;
-    let email_body_html = email_body + "\n<a href=\"" + unsubscribe_link + "\">Unsubscribe</a>";
+    email_body_text += "Unsubscribe: " + unsubscribe_link;
+    email_body_html += "<br><a href=\"" + unsubscribe_link + "\">Unsubscribe</a>";
     let email_subject = "Link with " + event.attendee.name + " from " + event.event_name;
     sendmail({ 
         from: "hello@linkbaby.io",
