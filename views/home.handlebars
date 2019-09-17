@@ -1,19 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-    <h2>Add Event</h2>
-    <form action="/addevent" method="post">
-        Event Name:<br>
-        <textarea name="event_name" rows="1" cols="50" placeholder="What was the event called?"></textarea> <br>
-        Host Name:<br>
-        <textarea name="host_name" rows="1" cols="50" placeholder="Who hosted the event?"></textarea> <br>
-        Emails:<br>
-        <textarea name="email_list" rows="10" cols="50" placeholder="Enter emails of attendees here (one per line)"></textarea> <br>
-        <br>
-        Intro Email Subject Line:<br>
-        <textarea name="intro_email_subject" rows="1" cols="50" placeholder="Subject line for introductory email."></textarea> <br>
-        Intro Email Body:<br>
-        <textarea name="intro_email_body" rows="10" cols="50" placeholder="This is the initial email to invite people to link up."></textarea> <br>
-        <br><br>
-        <input type="submit" value="Add Event">
-    </form>
+    <div class="container">
+        <form id="contact" action="/addevent" method="post">
+            <h3>Welcome to Link Baby</h3>
+            <h4>Add a New Event</h4>
+            <fieldset>
+                Event Name:<br>
+                <input type="text" name="event_name" placeholder="What was the event called?" required autofocus></textarea>
+            </fieldset>
+            <fieldset>
+                Host Name:<br>
+                <input type="text" name="host_name" rows="1" cols="50" placeholder="Who hosted the event?" require></textarea>
+            </fieldset>
+            <fieldset>
+                Emails:<br>
+                <textarea name="email_list" rows="10" cols="50" placeholder="Enter emails of attendees here (one per line)" require></textarea>
+            </fieldset>
+            <fieldset>
+                Intro Email Subject Line:<br>
+                <input type="text" name="intro_email_subject" rows="1" cols="50" placeholder="Subject line for introductory email." require></textarea>
+            </fieldset>
+            <fieldset>
+                Intro Email Body:<br>
+                <textarea name="intro_email_body" rows="10" cols="50" placeholder="This is the initial email to invite people to link up." require></textarea>
+            </fieldset>
+            <fieldset>
+                <button name="submit" type="submit" value="Add Event">Add Event</button>
+            </fieldset>
+            <p class="copyright">Designed by <a href="https://colorlib.com" target="_blank" title="Colorlib">Colorlib</a></p>
+        </form>
+    </div>
 </html>

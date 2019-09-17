@@ -1,3 +1,60 @@
 {
-  "users": []
+  "users": [
+    {
+      "email": "clemensvonstengel@gmail.com",
+      "name": "Clemens personal man",
+      "date_last_sent": 1568730141702,
+      "prefered_time": 0,
+      "days_between": 1,
+      "links": [
+        {
+          "email": "cv333@cam.ac.uk",
+          "events": [
+            {
+              "event_id": "event_4p6d0wk0nx6tte",
+              "user_id": "4p6d0wk0nx6ttd",
+              "event_name": "Test Event 1001",
+              "host_name": "Clemens",
+              "linked": true,
+              "when_linked": 1568730141702,
+              "attendee": {
+                "id": "4p6d0wk0nx6ttc",
+                "email": "cv333@cam.ac.uk",
+                "name": "Clemens Uni man",
+                "description": "Lots of stuff"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "email": "cv333@cam.ac.uk",
+      "name": "Clemens Uni man",
+      "date_last_sent": 1568730141708,
+      "prefered_time": 0,
+      "days_between": 1,
+      "links": [
+        {
+          "email": "clemensvonstengel@gmail.com",
+          "events": [
+            {
+              "event_id": "event_4p6d0wk0nx6tte",
+              "user_id": "4p6d0wk0nx6ttc",
+              "event_name": "Test Event 1001",
+              "host_name": "Clemens",
+              "linked": true,
+              "when_linked": 1568730141708,
+              "attendee": {
+                "id": "4p6d0wk0nx6ttd",
+                "email": "clemensvonstengel@gmail.com",
+                "name": "Clemens personal man",
+                "description": "Secret stuff"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

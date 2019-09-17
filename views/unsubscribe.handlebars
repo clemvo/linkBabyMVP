@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html>
-    <p>Hi {{email}},</p>
-    <p>There are multiple ways to unsubscribe. For instance, you could stop getting emails from link baby, but still let other people from other events find you.</p>
-    <form action="/unsubscribe_confirm" method="post">
-        <input type="checkbox" name="disconnect" value=true checked> Stop sending me emails from this event <br>
-        <!-- TODO: Button to get rid of everything -->
-        <input type="checkbox" name="make_unfindable" value=true checked> Stop sending other people from this event my email <br>
-        <input type="hidden" name="event_id" value={{ event_id }}>
-        <input type="hidden" name="id" value={{ id }}>
-        <br>
-        <input type="submit" value="Confirm">
-    </form>
+    <div class="container">
+        <h4>Hi {{email}},</h4>
+        <p>There are multiple ways to unsubscribe. For instance, you could stop getting emails from link baby, but still let other people from other events find you.</p>
+        <form id="contact" action="/unsubscribe_confirm" method="post">
+            <input type="checkbox" name="disconnect" value=true checked> Stop sending me emails from this event <br>
+            <!-- TODO: Button to get rid of everything -->
+            <input type="checkbox" name="make_unfindable" value=true checked> Stop sending other people from this event my email <br>
+            <input type="hidden" name="event_id" value={{ event_id }}>
+            <input type="hidden" name="id" value={{ id }}>
+            <br>
+            <fieldset>
+                <button name="submit" type="submit" value="Confirm">Confirm</button>
+            </fieldset>
+        </form>
+    </div>
 </html>
