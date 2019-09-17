@@ -239,24 +239,20 @@ app.post('/submit', function (req, res) {
 
 app.get('/unsubscribe/:event_id/:id', function (req, res) {
     //TODO: Include other data in unsubscribe screen
-    fs.readFileSync('eventdata.json', (err, raw) => {
-        if (err) {
-            console.log(err);
-            return;
-        }
-        let data = JSON.parse(raw);
-        let event = data.events.find((e) => (e.event_id == req.params.event_id));
-        if (!event) {
-            res.send("Error: Could not find event");
+    console.log(req.params.event_id)
+    let raw = fs.readFileSync('eventdata.json');
+    let data = JSON.parse(raw);
+    let event = data.events.find((e) => (e.event_id == req.params.event_id));
+    if (!event) {
+        res.send("Error: Could not find event");
+    } else {
+        let attendee = event.attendees.find((a) => (a.id == req.params.id));
+        if (!attendee){
+            res.send("Error: Could not find user");
         } else {
-            let attendee = event.attendees.find((a) => (a.id == req.params.id));
-            if (!attendee){
-                res.send("Error: Could not find user");
-            } else {
-                res.render('unsubscribe', { email: attendee.email, event_id: req.params.event_id, id: req.params.id });
-            }
+            res.render('unsubscribe', { email: attendee.email, event_id: req.params.event_id, id: req.params.id });
         }
-    })
+    }
 })
 
 app.post('/unsubscribe_confirm', function (req, res) {
