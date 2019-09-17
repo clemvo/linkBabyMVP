@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <p>Hi {{email}}!</p>
+    <p>You're about to be linked up! Over the coming days you will get daily emails about people who went to the same event as you, and they will get emails about you. This is where you get to control what other people see about you. </p>
+    <form action="/submit">
+        Name:<br>
+        <input type="text" name="name" placeholder="Your Name">
+        <br>
+        Description:<br>
+        <textarea name="description" rows="10" cols="50" placeholder="What do you do, and what are you interested in? What did you talk about at the event? Is there something you want to hear more about?"></textarea> <br>
+        <input type="checkbox" name="connected" value=true checked> Send me emails about people <br>
+        <input type="checkbox" name="findable" value=true checked> Send people emails about me <br>
+        <input type="hidden" name="event_id" value={{ event_id }}>
+        <input type="hidden" name="id" value={{ id }}>
+        <br>
+        <input type="submit" value="Submit">
+    </form>
+</html>
