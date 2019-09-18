@@ -93,56 +93,104 @@ function update_user_data() { //this will refresh userdata.json using eventdata.
         for (let e of event_data.events) {
             for (let attendee of e.attendees) {
                 if (attendee.connected) {
-                    //turn connected attendees into users
-                    let new_user_links = [];
-                    for (let other_attendee of e.attendees) {
-                        //add links from event
-                        if (other_attendee.email != attendee.email && other_attendee.findable) {
-                            new_user_links.push({ 
-                                email: other_attendee.email, 
-                                events: [{ 
-                                    event_id: e.event_id, 
-                                    user_id: attendee.id,
-                                    event_name: e.event_name,
-                                    host_name: e.host_name,
-                                    linked: false,
-                                    when_linked: 0,
-                                    attendee: { 
-                                        id: other_attendee.id,
-                                        email: other_attendee.email,
-                                        name: other_attendee.name, 
-                                        description: other_attendee.description 
-                                    }
-                                }],
-                            }); 
-                        }
-                    }
                     //check if attendee is already user, and add user or links accordingly
                     let attendee_already_user = false;
                     for (let user of users) {
                         if (user.email == attendee.email) {
-                            for (let new_link of new_user_links) {
-                                //check if is already linked
-                                let is_already_linked = false;
-                                for (let link of user.links) {
-                                    if (link.email == new_link.email) {
-                                        new_event = new_link.events[0];
-                                        if (!link.events.find( (e) => (e.event_id == new_event.event_id) )) { //check if event to be added in not already in link.events
-                                            link.events.push(new_event);
+                            //go through other attendees of event
+                            for (let other_attendee of e.attendees) {
+                                if (other_attendee.email != attendee.email) {
+                                    //check if already linked
+                                    let is_already_linked = false;
+                                    for (let link of user.links) {
+                                        if (link.email == other_attendee.email) { //check if already linked from some event
+                                            //check if link is from event in question
+                                            let is_link_event_in_question = false;
+                                            for (let link_event of link.events) {
+                                                if (link_event.event_id == e.event_id) { //linked through event in question
+                                                    if (!other_attendee.findable) {
+                                                        //unlink existing link
+                                                        link_event.clearup = true;
+                                                        link.events = link.events.filter((e) => !e.clearup);
+                                                        if (link.events.length == 0) {
+                                                            link.clearup = true;
+                                                        }
+                                                        user.links = user.links.filter((l) => !l.clearup);
+                                                    }
+                                                    is_link_event_in_question = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!is_link_event_in_question) {
+                                                link.events.push({
+                                                    event_id: e.event_id, 
+                                                    user_id: attendee.id,
+                                                    event_name: e.event_name,
+                                                    host_name: e.host_name,
+                                                    linked: false,
+                                                    when_linked: 0,
+                                                    attendee: { 
+                                                        id: other_attendee.id,
+                                                        email: other_attendee.email,
+                                                        name: other_attendee.name, 
+                                                        description: other_attendee.description 
+                                                    }
+                                                })
+                                            }
+                                            is_already_linked = true;
+                                            break;
                                         }
-                                        is_already_linked = true;
-                                        break;
                                     }
-                                }
-                                if (!is_already_linked) {
-                                    user.links.push(new_link);
+                                    if (!is_already_linked) {
+                                        user.links.push({ 
+                                            email: other_attendee.email, 
+                                            events: [{ 
+                                                event_id: e.event_id, 
+                                                user_id: attendee.id,
+                                                event_name: e.event_name,
+                                                host_name: e.host_name,
+                                                linked: false,
+                                                when_linked: 0,
+                                                attendee: { 
+                                                    id: other_attendee.id,
+                                                    email: other_attendee.email,
+                                                    name: other_attendee.name, 
+                                                    description: other_attendee.description 
+                                                }
+                                            }]
+                                        });
+                                    }
                                 }
                             }
                             attendee_already_user = true;
                             break;
                         }
                     }
+                    
                     if (!attendee_already_user) {
+                        let new_user_links = [];
+                        for (let other_attendee of e.attendees) {
+                            //add links from event
+                            if (other_attendee.email != attendee.email && other_attendee.findable) {
+                                new_user_links.push({ 
+                                    email: other_attendee.email, 
+                                    events: [{ 
+                                        event_id: e.event_id, 
+                                        user_id: attendee.id,
+                                        event_name: e.event_name,
+                                        host_name: e.host_name,
+                                        linked: false,
+                                        when_linked: 0,
+                                        attendee: { 
+                                            id: other_attendee.id,
+                                            email: other_attendee.email,
+                                            name: other_attendee.name, 
+                                            description: other_attendee.description 
+                                        }
+                                    }]
+                                }); 
+                            }
+                        }
                         users.push({
                             email: attendee.email, 
                             name: attendee.name,
@@ -239,7 +287,6 @@ app.post('/submit', function (req, res) {
 
 app.get('/unsubscribe/:event_id/:id', function (req, res) {
     //TODO: Include other data in unsubscribe screen
-    console.log(req.params.event_id)
     let raw = fs.readFileSync('eventdata.json');
     let data = JSON.parse(raw);
     let event = data.events.find((e) => (e.event_id == req.params.event_id));
@@ -293,7 +340,7 @@ function send_unsent_emails() { //TODO: check if async calls could fuck stuff up
             for (let event of data.events) {
                 for (let attendee of event.attendees) {
                     if (!attendee.intro_sent) {
-                        send_intro(attendee.email, event, attendee.id, (err) => {
+                        send_intro(attendee.email, event, attendee.id, (err) => { //TODO: fix that sometimes user id isn't event id
                             if (err){
                                 console.log(err)
                             } else {
