@@ -104,24 +104,22 @@ function update_user_data() { //this will refresh userdata.json using eventdata.
                                     let is_already_linked = false;
                                     for (let link of user.links) {
                                         if (link.email == other_attendee.email) { //check if already linked from some event
-                                            //check if link is from event in question
-                                            let is_link_event_in_question = false;
+                                            //check if event in question is in link
+                                            let event_in_question_is_in_link = false;
                                             for (let link_event of link.events) {
                                                 if (link_event.event_id == e.event_id) { //linked through event in question
                                                     if (!other_attendee.findable) {
-                                                        //unlink existing link
-                                                        link_event.clearup = true;
-                                                        link.events = link.events.filter((e) => !e.clearup);
-                                                        if (link.events.length == 0) {
-                                                            link.clearup = true;
-                                                        }
-                                                        user.links = user.links.filter((l) => !l.clearup);
+                                                        link_event.clearup = true; //mark link
                                                     }
-                                                    is_link_event_in_question = true;
+                                                    event_in_question_is_in_link = true;
                                                     break;
                                                 }
                                             }
-                                            if (!is_link_event_in_question) {
+                                            link.events = link.events.filter((e) => !e.clearup);
+                                            if (link.events.length == 0) {
+                                                link.clearup = true;
+                                            }
+                                            if (!event_in_question_is_in_link) {
                                                 link.events.push({
                                                     event_id: e.event_id, 
                                                     user_id: attendee.id,
@@ -141,7 +139,8 @@ function update_user_data() { //this will refresh userdata.json using eventdata.
                                             break;
                                         }
                                     }
-                                    if (!is_already_linked) {
+                                    user.links = user.links.filter((l) => !l.clearup);
+                                    if (!is_already_linked && other_attendee.findable) {
                                         user.links.push({ 
                                             email: other_attendee.email, 
                                             events: [{ 
@@ -194,9 +193,8 @@ function update_user_data() { //this will refresh userdata.json using eventdata.
                         users.push({
                             email: attendee.email, 
                             name: attendee.name,
-                            date_last_sent: 0,
+                            date_last_sent: Date.now(), //such that the first email isn't until the next day
                             prefered_time: 0, //TODO: implement this
-                            days_between: 1,
                             links: new_user_links
                         });
                     }
@@ -233,7 +231,6 @@ function update_user_data() { //this will refresh userdata.json using eventdata.
 
 app.get('/linkme/:event_id/:id', function (req, res) {
     //TODO: check if already linked
-    console.log("/link me works");
     fs.readFile('eventdata.json', (err, raw) => {
         if (err) {
             console.log(err);
@@ -330,61 +327,54 @@ app.post('/unsubscribe_confirm', function (req, res) {
 //Check data for unsent regularly
 function send_unsent_emails() { //TODO: check if async calls could fuck stuff up here
     //send intro emails which haven't been sent
-    fs.readFile('eventdata.json', (err, raw) => {
-        if (err) {
-            console.log(err);
-            return;
-        }
-        let data = JSON.parse(raw);
-        if (data.events) {
-            for (let event of data.events) {
-                for (let attendee of event.attendees) {
-                    if (!attendee.intro_sent) {
-                        send_intro(attendee.email, event, attendee.id, (err) => { //TODO: fix that sometimes user id isn't event id
-                            if (err){
-                                console.log(err)
-                            } else {
-                                attendee.intro_sent = true; //TODO: databaase !!
-                                fs.writeFileSync('eventdata.json', JSON.stringify(data, null, 2));
-                            }
-                        });
-                    }
+    let event_raw = fs.readFileSync('eventdata.json');
+    let event_data = JSON.parse(event_raw);
+    if (event_data.events) {
+        for (let event of event_data.events) {
+            for (let attendee of event.attendees) {
+                if (!attendee.intro_sent) {
+                    send_intro(attendee.email, event, attendee.id, (err) => { //TODO: fix that sometimes user id isn't right
+                        if (err){
+                            console.log(err);
+                        }
+                    });
+                    attendee.intro_sent = true; //not in callback to avoid repeat send errors
+                    fs.writeFileSync('eventdata.json', JSON.stringify(event_data, null, 2));
                 }
             }
         }
-    });
+    }
 
     //send daily emails if they haven't been sent
-    fs.readFile('userdata.json', (err, raw) => {
-        if (err) {
-            console.log(err);
-            return;
-        }
-        let data = JSON.parse(raw);
-        if (data.users) {
-            for (let u of data.users) {
-                DAY_LENGTH = 300000; //TODO: change this to 24*60*60*1000 rather than 5 minutes
-                if(Date.now() - u.date_last_sent > u.days_between*DAY_LENGTH /*- 1800000 */) { // - 1800000 so that it doesn't creep forward in time TODO: uncomment this
-                    //TODO: also check that it is past prefered time of day
-                    for (link of u.links) {
-                        if (link.events.find( (e) => (!e.linked) )) { //if [not linked] from at least one event
-                            for (let event of link.events) {
-                                if (!event.linked) {
-                                    send_link(u.email, event);
-                                    event.linked = true; //TODO: put in callback
-                                    event.when_linked = Date.now(); 
-                                    u.date_last_sent = Date.now();
-                                    break;
-                                }
+    let user_raw = fs.readFileSync('userdata.json');
+    let user_data = JSON.parse(user_raw);
+    if (user_data.users) {
+        for (let u of user_data.users) {
+            DAY_LENGTH = 30000; //TODO: change this to 24*60*60*1000 rather than 30 secs
+            if(Date.now() - u.date_last_sent > DAY_LENGTH /*- 1800000 */) { // - 1800000 so that it doesn't creep forward in time TODO: uncomment this
+                //TODO: also check that it is past prefered time of day
+                for (link of u.links) {
+                    if (link.events.find( (e) => (!e.linked) )) { //if [not linked] from at least one event
+                        for (let event of link.events) {
+                            if (!event.linked) {
+                                send_link(u.email, event, (err) => {
+                                    if (err) {
+                                        console.log(err);
+                                    }
+                                });
+                                event.linked = true; //not in callback to avoid repeat send errors
+                                event.when_linked = Date.now(); 
+                                u.date_last_sent = Date.now();
+                                fs.writeFileSync('userdata.json', JSON.stringify(user_data, null, 2));
+                                break;
                             }
-                            break; //stop at first email
                         }
+                        break; //stop at first email
                     }
                 }
             }
         }
-        fs.writeFileSync('userdata.json', JSON.stringify(data, null, 2));
-    })
+    }
 }
 
 setInterval(send_unsent_emails, 3000); //TODO: call this function regularly reliably
