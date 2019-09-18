@@ -4,6 +4,11 @@ const fs = require('fs'); //for reading and writing into data.json
 const uniqid = require('uniqid'); //for generate unique ids TODO: replace this with something less easy to guess
 const shuffle = require('shuffle-array');
 
+String.prototype.replaceAll = function(str1, str2, ignore) 
+{
+    return this.replace(new RegExp(str1.replace(/([\/\,\!\\\^\$\{\}\[\]\(\)\.\*\+\?\|\<\>\-\&])/g,"\\$&"),(ignore?"gi":"g")),(typeof(str2)=="string")?str2.replace(/\$/g,"$$$$"):str2);
+} 
+
 require('dotenv').config();
 
 let app = express();
@@ -354,7 +359,7 @@ function send_unsent_emails() { //TODO: check if async calls could fuck stuff up
     let user_data = JSON.parse(user_raw);
     if (user_data.users) {
         for (let u of user_data.users) {
-            DAY_LENGTH = 30000; //TODO: change this to 24*60*60*1000 rather than 30 secs
+            DAY_LENGTH = 24*60*60*1000; //TODO: change this to 24*60*60*1000 rather than 30 secs
             if(Date.now() - u.date_last_sent > DAY_LENGTH /*- 1800000 */) { // - 1800000 so that it doesn't creep forward in time TODO: uncomment this
                 //TODO: also check that it is past prefered time of day
                 for (link of u.links) {
@@ -392,21 +397,21 @@ function send_intro(email, event, user_id, callback){
         to: email,
         subject: event.intro_email_subject,
         text: event.intro_email_body + "\n\nLink me: " + link,
-        html: event.intro_email_body + "<br><br><a href=\"" + link + "\">Link me!</a>"
+        html: event.intro_email_body.replaceAll("\n", "<br>") + "<br><br><a href=\"" + link + "\">Link me!</a>"
     }, (err) => callback(err)); //TODO: make email prettier
 }
 
 function send_link(email, event, callback){ //events is in the format of userdata.json > users > links > events
     //TODO: improve this email (also options if there mulitple events)
     let first_line = "Hey this is Link Baby! You met " + event.attendee.name + " at " + event.event_name + ".";
-    let email_body_text = first_line + "\n About  " + event.attendee.name + ":";
-    let email_body_html = first_line + "<br> About  " + event.attendee.name + ":";
+    let email_body_text = first_line + "\n\n About  " + event.attendee.name + ":";
+    let email_body_html = first_line + "<br><br> About  " + event.attendee.name + ":";
     email_body_text += "\n" + event.attendee.description + "\n\n";
     email_body_html += "<br>" + event.attendee.description + "<br><br>";
     email_body_text += "If you want to talk to " + event.attendee.name + ", just reply to this email and it will go straight to them! If not, ignore this email - they won’t know!"
     email_body_html += "If you want to talk to " + event.attendee.name + ", just reply to this email and it will go straight to them! If not, ignore this email - they won’t know!"
-    email_body_text += "\n\n";
-    email_body_html += "<br><br>";
+    email_body_text += "\n\n If anything about this is broken, please email cv333@cam.ac.uk to let me know. Thanks! \n\n";
+    email_body_html += "<br><br> If anything about this is broken, please email cv333@cam.ac.uk to let me know. Thanks! <br><br>";
 
     //TODO: Add "I’ll send you another person tomorrow. If you want to see a list of everyone from $data.groupName all at once, click here!" + functionality
 
