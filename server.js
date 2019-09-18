@@ -2,6 +2,7 @@
 const express = require('express'); //for serving
 const fs = require('fs'); //for reading and writing into data.json
 const uniqid = require('uniqid'); //for generate unique ids TODO: replace this with something less easy to guess
+const shuffle = require('shuffle-array');
 
 require('dotenv').config();
 
@@ -222,6 +223,9 @@ function update_user_data() { //this will refresh userdata.json using eventdata.
     }
 
     //TODO: sort links of each user based on order they *should* be linked
+    for (let user of users){
+        shuffle(user.links);
+    }
 
     //update user database
     let user_data = {};
