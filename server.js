@@ -394,9 +394,9 @@ function send_intro(email, event, user_id, callback){
 
 function send_link(email, event, callback){ //events is in the format of userdata.json > users > links > events
     //TODO: improve this email (also options if there mulitple events)
-    let email_body = "Link with " + event.attendee.name + " from " + event.event_name;
-    let email_body_text = "\n About  " + event.attendee.name + ":";
-    let email_body_html = "<br> About  " + event.attendee.name + ":";
+    let first_line = "Hey this is Link Baby! You met " + event.attendee.name + " at " + event.event_name + ".";
+    let email_body_text = first_line + "\n About  " + event.attendee.name + ":";
+    let email_body_html = first_line + "<br> About  " + event.attendee.name + ":";
     email_body_text += "\n" + event.attendee.description + "\n\n";
     email_body_html += "<br>" + event.attendee.description + "<br><br>";
     email_body_text += "If you want to talk to " + event.attendee.name + ", just reply to this email and it will go straight to them! If not, ignore this email - they won’t know!"
