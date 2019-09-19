@@ -359,7 +359,7 @@ function send_unsent_emails() { //TODO: check if async calls could fuck stuff up
     let user_data = JSON.parse(user_raw);
     if (user_data.users) {
         for (let u of user_data.users) {
-            DAY_LENGTH = 24*60*60*1000; //TODO: change this to 24*60*60*1000 rather than 30 secs
+            DAY_LENGTH = 30000; //TODO: change this to 24*60*60*1000 rather than 30 secs
             if(Date.now() - u.date_last_sent > DAY_LENGTH /*- 1800000 */) { // - 1800000 so that it doesn't creep forward in time TODO: uncomment this
                 //TODO: also check that it is past prefered time of day
                 for (link of u.links) {
@@ -402,22 +402,26 @@ function send_intro(email, event, user_id, callback){
 }
 
 function send_link(email, event, callback){ //events is in the format of userdata.json > users > links > events
-    //TODO: improve this email (also options if there mulitple events)
-    let first_line = "Hey this is Link Baby! You met " + event.attendee.name + " at " + event.event_name + ".";
-    let email_body_text = first_line + "\n\n About  " + event.attendee.name + ":";
-    let email_body_html = first_line + "<br><br> About  " + event.attendee.name + ":";
-    email_body_text += "\n" + event.attendee.description + "\n\n";
-    email_body_html += "<br>" + event.attendee.description + "<br><br>";
-    email_body_text += "If you want to talk to " + event.attendee.name + ", just reply to this email and it will go straight to them! If not, ignore this email - they won’t know!"
-    email_body_html += "If you want to talk to " + event.attendee.name + ", just reply to this email and it will go straight to them! If not, ignore this email - they won’t know!"
-    email_body_text += "\n\n If anything about this is broken, please email cv333@cam.ac.uk to let me know. Thanks! \n\n";
-    email_body_html += "<br><br> If anything about this is broken, please email cv333@cam.ac.uk to let me know. Thanks! <br><br>";
+    let email_body_text = "linkbaby.io is connecting you to people you met at " + event.event_name + ":";
+    let email_body_html = "<p><a title=\"linkbaby\" href=\"https://linkbaby.io\" target=\"_blank\" rel=\"noopener\">linkbaby.io</a> is connecting you to people you met at <strong>" + event.event_name + "</strong>:"; 
+    
+    email_body_text += "\n\n\n" + event.attendee.name;
+    email_body_html += "<br><br><br><big><strong>" + event.attendee.name + "</strong>";
+    
+    email_body_text += "\n\"" + event.attendee.description + "\"\n\n\n";
+    email_body_html += "<br>\"" + event.attendee.description + "\"</big><br><br><br>";
+    
+    email_body_text += "If you want to contact " + event.attendee.name + ", just reply directly to this email.\nIf not, ignore this email - they won’t know!"
+    email_body_html += "If you want to contact " + event.attendee.name + ", just reply directly to this email.<br>If not, ignore this email - they won’t know!"
+    
+    email_body_text += "\n\nPS: linkbaby.io is just a prototype!\nIf anything seems to be broken, or you have any queries, please email help@linkbaby.io\n\n";
+    email_body_html += "<br><br>PS: <a title=\"linkbaby\" href=\"https://linkbaby.io\" target=\"_blank\" rel=\"noopener\">linkbaby.io</a> is just a prototype!\nIf anything seems to be broken, or you have any queries, please email <a title=\"mailto help@linkbaby.io\" href=\"mailto:help@linkbaby.io\" target=\"_blank\" rel=\"noopener\">help@linkbaby.io</a><br><br>";
 
     //TODO: Add "I’ll send you another person tomorrow. If you want to see a list of everyone from $data.groupName all at once, click here!" + functionality
 
     let unsubscribe_link = "https://www.linkbaby.io/unsubscribe/" + event.event_id + "/" + event.user_id; //TODO: change to actual link !! IMPORTANT
     email_body_text += "Unsubscribe: " + unsubscribe_link;
-    email_body_html += "<br><a href=\"" + unsubscribe_link + "\">Unsubscribe</a>";
+    email_body_html += "<br><a href=\"" + unsubscribe_link + "\">Unsubscribe</a></p>";
     let email_subject = "Link with " + event.attendee.name + " from " + event.event_name;
     sendmail({
         from: event.attendee.name + " via Linkbaby <hello@linkbaby.io>",
