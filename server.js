@@ -114,7 +114,7 @@ function update_user_data() { //this will refresh userdata.json using eventdata.
                                             let event_in_question_is_in_link = false;
                                             for (let link_event of link.events) {
                                                 if (link_event.event_id == e.event_id) { //linked through event in question
-                                                    if (!other_attendee.findable) {
+                                                    if (!other_attendee.findable || link_event.attendee.name == "") {
                                                         link_event.clearup = true; //mark link
                                                     }
                                                     event_in_question_is_in_link = true;
