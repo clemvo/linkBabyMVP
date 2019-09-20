@@ -365,7 +365,7 @@ function send_unsent_emails() { //TODO: check if async calls could fuck stuff up
                 for (link of u.links) {
                     if (link.events.find( (e) => (!e.linked) )) { //if [not linked] from at least one event
                         for (let event of link.events) {
-                            if (!event.linked) {
+                            if (!event.linked && event.attendee.name != "") { //the  ~ && event.attendee.name != ""  ~ is covering over a bug where you would get empty emails
                                 send_link(u.email, event, (err) => {
                                     if (err) {
                                         console.log(err);
