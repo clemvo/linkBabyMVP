@@ -359,7 +359,7 @@ function send_unsent_emails() { //TODO: check if async calls could fuck stuff up
     let user_data = JSON.parse(user_raw);
     if (user_data.users) {
         for (let u of user_data.users) {
-            DAY_LENGTH = 300000; //TODO: change this to 24*60*60*1000 rather than 30 secs
+            DAY_LENGTH = 24*60*60*1000; //TODO: change this to 24*60*60*1000 rather than 30 secs
             if(Date.now() - u.date_last_sent > DAY_LENGTH /*- 1800000 */) { // - 1800000 so that it doesn't creep forward in time TODO: uncomment this
                 //TODO: also check that it is past prefered time of day
                 for (link of u.links) {
