@@ -81,7 +81,7 @@ app.post('/addevent', function (req, res) {
     
     fs.writeFileSync('eventdata.json', JSON.stringify(data, null, 2));
     update_user_data(); //TODO: check if this call is necessary, and if not remove it
-    res.send('Event Added!'); //TODO: make this nice
+    res.send('Email sent! Thank you for trying out the linkbaby.io prototype! If anything seems to be broken, email help@linkbaby.io'); //TODO: make this nice
 });
 
 function is_email_format(email) { //returns true if input is valid email address
