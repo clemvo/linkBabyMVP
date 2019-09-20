@@ -2,8 +2,14 @@
 <html lang="en">
     <div class="container">
         <form id="contact" action="/addevent" method="post">
-            <h3>linkbaby.io</h3>
-            <h4>Keep the conversation going</h4>
+            <h2>linkbaby.io</h2>
+            <p>Help people stay in touch with each other after a meetup or event. No more disappointing mailing lists or group chats - just a new and interesting network.</p>
+            <h3>How it works</h3>
+            <li>
+                <ul>After your event or meetup, share each attendee’s email with linkbaby.io. We’ll email them individually asking them to give us two or three sentences about who they are and what they do.</ul>
+                <ul>linkbaby.io will send a little email to each attendee every day, reminding them about one person they met at the event. People can then email each other directly.</ul>
+                <ul>It’s totally free, and everyone can opt out at any time.</ul>
+            </li>
             <fieldset>
                 Event Name:<br>
                 <input type="text" name="event_name" placeholder="What was the event called?" required autofocus></textarea>
@@ -14,7 +20,7 @@
             </fieldset>
             <fieldset>
                 Emails:<br>
-                <textarea name="email_list" rows="10" cols="50" placeholder="Enter emails of attendees here (one per line)" require></textarea>
+                <textarea name="email_list" rows="10" cols="50" placeholder="Enter emails of attendees here (one per line).\nDon't forget yourself!" require></textarea>
             </fieldset>
             <fieldset>
                 Intro Email Subject Line:<br>
