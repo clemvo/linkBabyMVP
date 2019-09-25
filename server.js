@@ -81,7 +81,7 @@ app.post('/addevent', function (req, res) {
     
     fs.writeFileSync('eventdata.json', JSON.stringify(data, null, 2));
     update_user_data(); //TODO: check if this call is necessary, and if not remove it
-    res.send('Email sent! Thank you for trying out the linkbaby.io prototype! If anything seems to be broken, email help@linkbaby.io'); //TODO: make this nice
+    res.send('Email sent! Thank you for trying out the linkbaby.io prototype! If anything seems to be broken, email ed@newspeak.house'); //TODO: make this nice
 });
 
 function is_email_format(email) { //returns true if input is valid email address
@@ -414,8 +414,8 @@ function send_link(email, event, callback){ //events is in the format of userdat
     email_body_text += "If you want to contact " + event.attendee.name + ", just reply directly to this email.\nIf not, ignore this email - they won’t know!"
     email_body_html += "If you want to contact " + event.attendee.name + ", just reply directly to this email.<br>If not, ignore this email - they won’t know!"
     
-    email_body_text += "\n\nPS: linkbaby.io is just a prototype!\nIf anything seems to be broken, or you have any queries, please email help@linkbaby.io\n\n";
-    email_body_html += "<br><br>PS: <a title=\"linkbaby\" href=\"https://linkbaby.io\" target=\"_blank\" rel=\"noopener\">linkbaby.io</a> is just a prototype!\nIf anything seems to be broken, or you have any queries, please email <a title=\"mailto help@linkbaby.io\" href=\"mailto:help@linkbaby.io\" target=\"_blank\" rel=\"noopener\">help@linkbaby.io</a><br><br>";
+    email_body_text += "\n\nPS: linkbaby.io is just a prototype!\nIf anything seems to be broken, or you have any queries, please email ed@newspeak.house\n\n";
+    email_body_html += "<br><br>PS: <a title=\"linkbaby\" href=\"https://linkbaby.io\" target=\"_blank\" rel=\"noopener\">linkbaby.io</a> is just a prototype!\nIf anything seems to be broken, or you have any queries, please email <a title=\"mailto ed@newspeak.house\" href=\"mailto:ed@newspeak.house\" target=\"_blank\" rel=\"noopener\">ed@newspeak.house</a><br><br>";
 
     //TODO: Add "I’ll send you another person tomorrow. If you want to see a list of everyone from $data.groupName all at once, click here!" + functionality
 
